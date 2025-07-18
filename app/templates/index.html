@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'index.css' %}">
+    <title>TalentScout</title>
+</head>
+
+<body>
+    <nav class="navbar navbar-light custom-navbar">
+        <a class="navbar-brand" href="#">
+            <img src="{% static 'logo.png' %}" height="80" class="d-inline-block align-top" alt="">
+        </a>
+    </nav>
+    <div class="tagline-box">
+        <h2 class="tagline">Your AI Assistant for Smarter Hiring</h2>
+    </div>
+    <div class="butts">
+        <a class="button" href="{% url 'feature1' %}">
+            <p class="text">Filter Candidates</p>
+        </a>
+        <a class="button" href="{% url 'feature2' %}">
+            <p class="text">Check Eligibility</p>
+        </a>
+    </div>
+</body>
+
+</html>
