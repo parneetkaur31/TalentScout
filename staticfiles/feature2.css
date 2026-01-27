@@ -1,0 +1,99 @@
+body {
+    background-color: whitesmoke;
+  }  
+
+.custom-navbar {
+    background-color: #7731D8 !important; 
+    width: 100%;
+    height: 90px;
+  }
+  
+  .inputs {
+    display: flex;
+    justify-content: center;
+    padding: 40px 0 40px;
+    gap: 40px;
+}
+
+
+.input {
+    max-width: 190px;
+    display: none;
+
+
+}
+
+.labelFile {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 250px;
+    height: 190px;
+    border: 2px dashed #ccc;
+    align-items: center;
+    text-align: center;
+    padding: 5px;
+    color: #404040;
+    cursor: pointer;
+}
+
+.prompt-box{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 30px;
+}
+
+.input-style {
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #555;
+    outline: none;
+    width: 500px;
+
+}
+
+.input-style:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #7731D8;
+    outline: 3px #7731D8 solid;
+    outline-offset: -3px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: 400ms;
+    width: 200px;
+    height: 50px;
+    text-decoration: none;
+}
+
+.button .text {
+    color: whitesmoke;
+    font-weight: 700;
+    font-size: 20px;
+    font-family: 'DM Sans', sans-serif;
+    transition: 400ms;
+}
+
+.button:hover {
+    background-color: transparent;
+}
+
+.button:hover .text {
+    color: #7731D8;
+}
+
+.output-box {
+    padding-left: 200px;
+    width: 50%;
+}
