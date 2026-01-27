@@ -4,11 +4,20 @@ from django.http import JsonResponse
 from django.core.files.storage import FileSystemStorage
 from django.contrib import messages
 import csv
-import google.generativeai as genai
+from openai import OpenAI
 import pandas as pd
 import os
 import PyPDF2 
 from docx import Document  
+from dotenv import load_dotenv
+
+load_dotenv()
+
+api_key = os.getenv("OPENAI_API_KEY")
+
+client = OpenAI(api_key=api_key) if api_key else None
+
+
 
 # Create your views here.
 def index(request):
@@ -25,19 +34,36 @@ def csv_to_string(filename):
     return result_string
 
 
+
 def extract_fields(file, entered_prompt):
     extracted_str = csv_to_string(file)
 
-    prompt = f'''
-        Data: {extracted_str}
-        Required: {entered_prompt} 
-        I need a list with columns separated by ',' and rows separated by ';' ,not code. 
-    '''
-    
-    genai.configure(api_key="AIzaSyDa5gR5rnC0E2hwMLwh9rtUS1d4D3NMw3I")
-    model = genai.GenerativeModel('gemini-1.5-flash')
-    response = model.generate_content(prompt)
-    return response
+    prompt = f"""
+    Data:
+    {extracted_str}
+
+    Required:
+    {entered_prompt}
+
+    Return rows separated by ';' and columns by ','.
+    Do not return code.
+    """
+
+    if not client:
+        return "AI service is temporarily unavailable. Please try later."
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are a helpful data extractor."},
+            {"role": "user", "content": prompt}
+        ]
+    )
+
+    return response.choices[0].message.content.strip()
+
+
+
 
 def generate_table(input_data):
     rows = input_data.strip(';').split(';')
@@ -59,7 +85,7 @@ def feature1(request):
         file_path = fs.path(filename) 
         
         response = extract_fields(file_path, entered_prompt)
-        table = generate_table(response.text)
+        table = generate_table(response)
         table_html = table.to_html(classes="table table-bordered", index=False)
         messages.success(request, 'Processing completed!')
         return render(request, 'feature1.html', {'table_html': table_html})
@@ -89,18 +115,32 @@ def extract_text_from_docx(file_path):
     doc = Document(file_path)
     return "\n".join([para.text for para in doc.paragraphs])
 
-def send_to_gemini(cv_content, criteria):
-    prompt = f'''
-        ResumeContent: {cv_content}
-        RequirementCriterias: {criteria}
+def send_to_openai(cv_content, criteria):
 
-        Which of the requirement criteria does the resume satisfy? Return the answer in points(points should be separated by a ';' character) and state 'satisfied' or 'unsatisfied' against each criteria. 
-    '''
+    prompt = f"""
+    Resume Content:
+    {cv_content}
 
-    genai.configure(api_key="AIzaSyALyWSCHwE4xsnSo0xb_qnzUdp3q-6uxqw")  
-    model = genai.GenerativeModel('gemini-1.5-flash')
-    response = model.generate_content(prompt)
-    return response
+    Criteria:
+    {criteria}
+
+    For each criteria, say satisfied or unsatisfied.
+    Separate points with ';'.
+    """
+
+    if not client:
+        return "AI service is temporarily unavailable. Please try later."
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are an expert HR evaluator."},
+            {"role": "user", "content": prompt}
+        ]
+    )
+
+    return response.choices[0].message.content.strip()
+
 
 def split_response(response):
     # Split the response by semicolon and strip extra spaces from each point
@@ -120,7 +160,8 @@ def feature2(request):
 
         cv_content = extract_cv_content(file_path)
 
-        response = send_to_gemini(cv_content, criteria)
-        context['response_text'] = split_response(response.text)
+        response = send_to_openai(cv_content, criteria)
+
+        context['response_text'] = split_response(response)
 
     return render(request, 'feature2.html', context)
