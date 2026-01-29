@@ -49,13 +49,13 @@
                                 </g>
                             </g>
                         </svg></span>
-                    <p>upload data file here!</p>
+                    <p id="file-status">upload data file here!</p>
                 </label>
                 <input class="input" name="file" id="file" type="file" />
                 {% if messages %}
-                <div class="alert alert-success">
+                <div class="status-box">
                     {% for message in messages %}
-                    <p>{{ message }}</p>
+                    <p id="status-text">{{ message }}</p>
                     {% endfor %}
                 </div>
                 {% endif %}
@@ -87,13 +87,22 @@
         </div>
         {% endif %}
     </div>
-
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
             const form = document.querySelector("form");
+
             const statusBox = document.getElementById("status-box");
             const statusText = document.getElementById("status-text");
+
+            const fileInput = document.getElementById("file");
+            const fileLabel = document.querySelector(".labelFile p");
+
+            if (!form || !statusText || !fileInput || !fileLabel) return;
+
+            /* ----------------------------
+               Dynamic Status Messages
+            -----------------------------*/
 
             const messages = [
                 "Processing your data...",
@@ -106,31 +115,62 @@
             let index = 0;
             let intervalId = null;
 
+            /* ----------------------------
+               File Upload Status
+            -----------------------------*/
+
+            fileInput.addEventListener("change", function () {
+
+                if (fileInput.files.length > 0) {
+                    fileLabel.innerText = "File uploaded ✅";
+                } else {
+                    fileLabel.innerText = "Upload data file here!";
+                }
+
+            });
+
+            /* ----------------------------
+               Form Submit
+            -----------------------------*/
+
             form.addEventListener("submit", function () {
 
                 // Show status box
-                statusBox.style.display = "block";
+                if (statusBox) {
+                    statusBox.style.display = "block";
+                }
+
+                index = 0;
 
                 // Start changing text
-                intervalId = setInterval(() => {
+                intervalId = setInterval(function () {
                     statusText.innerText = messages[index];
                     index = (index + 1) % messages.length;
                 }, 1500);
 
             });
 
-            // Stop animation when page reloads with result
+            /* ----------------------------
+               After Response (Reload)
+            -----------------------------*/
+
             window.addEventListener("load", function () {
 
                 {% if table_html %}
-                if (intervalId) clearInterval(intervalId);
+
+                if (intervalId) {
+                    clearInterval(intervalId);
+                }
+
                 statusText.innerText = "Here is your output ✅";
+
                 {% endif %}
 
             });
 
         });
     </script>
+
 
 
 </body>
