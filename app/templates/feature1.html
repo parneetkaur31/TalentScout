@@ -72,7 +72,11 @@
         </div>
 
     </form>
-    
+
+    <div id="status-box" class="status-box" style="display:none;">
+        <p id="status-text">Processing...</p>
+    </div>
+
     <div class="output-table">
         {% if table_html %}
         <div class="tagline-box">
@@ -83,6 +87,52 @@
         </div>
         {% endif %}
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const form = document.querySelector("form");
+            const statusBox = document.getElementById("status-box");
+            const statusText = document.getElementById("status-text");
+
+            const messages = [
+                "Processing your data...",
+                "Analyzing your prompt...",
+                "Sending request to server...",
+                "Extracting results...",
+                "Almost done..."
+            ];
+
+            let index = 0;
+            let intervalId = null;
+
+            form.addEventListener("submit", function () {
+
+                // Show status box
+                statusBox.style.display = "block";
+
+                // Start changing text
+                intervalId = setInterval(() => {
+                    statusText.innerText = messages[index];
+                    index = (index + 1) % messages.length;
+                }, 1500);
+
+            });
+
+            // Stop animation when page reloads with result
+            window.addEventListener("load", function () {
+
+                {% if table_html %}
+                if (intervalId) clearInterval(intervalId);
+                statusText.innerText = "Here is your output ✅";
+                {% endif %}
+
+            });
+
+        });
+    </script>
+
+
 </body>
 
 </html>

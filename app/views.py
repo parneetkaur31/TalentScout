@@ -76,9 +76,9 @@ def generate_table(input_data):
 
 def feature1(request):
     if request.method == 'POST' and request.FILES.get('file') and request.POST.get('textbox'):
-        messages.success(request, 'Processing your data. Please wait...')
+
         uploaded_file = request.FILES['file']
-        entered_prompt = request.POST['textbox']  # Capture the prompt value
+        entered_prompt = request.POST['textbox']
         
         fs = FileSystemStorage()
         filename = fs.save(uploaded_file.name, uploaded_file)
@@ -87,7 +87,7 @@ def feature1(request):
         response = extract_fields(file_path, entered_prompt)
         table = generate_table(response)
         table_html = table.to_html(classes="table table-bordered", index=False)
-        messages.success(request, 'Processing completed!')
+
         return render(request, 'feature1.html', {'table_html': table_html})
     
     return render(request, 'feature1.html')
