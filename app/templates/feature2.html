@@ -72,6 +72,13 @@
         </div>
 
     </form>
+
+    <!-- Status Box -->
+    <div id="status-box" style="display:none; margin-left: 100px; margin-top: 20px;">
+        <p id="status-text" style="font-weight: bold;"></p>
+    </div>
+
+
     <div class="output-box">
         {% if response_text %}
         <div class="tagline-box">
@@ -84,6 +91,63 @@
         </div>
         {% endif %}
     </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const form = document.querySelector("form");
+    const fileInput = document.getElementById("file");
+    const uploadLabel = document.querySelector(".labelFile p");
+
+    const statusBox = document.getElementById("status-box");
+    const statusText = document.getElementById("status-text");
+
+    const messages = [
+        "Processing resume...",
+        "Extracting content...",
+        "Analyzing criteria...",
+        "Sending request to AI...",
+        "Almost done..."
+    ];
+
+    let index = 0;
+    let intervalId = null;
+
+    /* ---------- File Upload Feedback ---------- */
+    fileInput.addEventListener("change", function () {
+        if (fileInput.files.length > 0) {
+            uploadLabel.innerText =
+                "Uploaded: " + fileInput.files[0].name + " ✅";
+        }
+    });
+
+    /* ---------- On Form Submit ---------- */
+    form.addEventListener("submit", function () {
+
+        statusBox.style.display = "block";
+
+        statusText.innerText = messages[0];
+        index = 1;
+
+        intervalId = setInterval(() => {
+            statusText.innerText = messages[index];
+            index = (index + 1) % messages.length;
+        }, 1500);
+
+    });
+
+    /* ---------- When Result Comes ---------- */
+    window.addEventListener("load", function () {
+
+        {% if response_text %}
+            if (intervalId) clearInterval(intervalId);
+            statusText.innerText = "Here is your result ✅";
+        {% endif %}
+
+    });
+
+});
+</script>
 
 </body>
 
